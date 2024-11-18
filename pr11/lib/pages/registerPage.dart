@@ -22,8 +22,13 @@ class _RegisterPageState extends State<RegisterPage> {
     final confirmPassword = confirmPasswordController.text;
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Пароли не совпадают')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          'Пароли не совпадают',
+          style: TextStyle(color: Colors.black, fontSize: 16.0),
+        ),
+        backgroundColor: Colors.amber[700],
+      ));
       return;
     }
     try {
@@ -31,8 +36,13 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "Error: $e",
+            style: TextStyle(color: Colors.black, fontSize: 16.0),
+          ),
+          backgroundColor: Colors.amber[700],
+        ));
       }
     }
   }
@@ -73,6 +83,27 @@ class _RegisterPageState extends State<RegisterPage> {
                                 width: 2.0)),
                       ),
                       controller: nameController,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: TextField(
+                      style:
+                          const TextStyle(fontSize: 14.0, color: Colors.black),
+                      decoration: const InputDecoration(
+                        hintText: 'Почта',
+                        hintStyle:
+                            const TextStyle(fontSize: 14.0, color: Colors.grey),
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
+                      ),
+                      controller: mailController,
                     ),
                   ),
                   Padding(

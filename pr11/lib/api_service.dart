@@ -233,7 +233,7 @@ class ApiService {
     }
   }
 
-  Future<Person> getUserByID(int index) async {
+  Future<Person> getUserByID(String? index) async {
     final link = 'http://${ip}:8080/users/$index';
     try {
       final response = await _dio.get(link);

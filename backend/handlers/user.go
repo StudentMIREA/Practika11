@@ -15,7 +15,7 @@ func GetUser(db *sqlx.DB) gin.HandlerFunc {
 		userId := c.Param("userId")
 		var product models.User
 		err := db.Get(&product, `SELECT * FROM users 
-								WHERE id = $1`, userId)
+								WHERE mail = $1`, userId)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
 			fmt.Println("Error")

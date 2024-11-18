@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pr11/api_service.dart';
+import 'package:pr11/auth/auth_service.dart';
 import 'package:pr11/model/person.dart';
 
 class EditPage extends StatefulWidget {
@@ -15,12 +16,13 @@ class _EditPageState extends State<EditPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController mailController = TextEditingController();
+  final userEmail = AuthService().getCurrentUserEmail();
   String img_link = '';
 
   @override
   void initState() {
     super.initState();
-    ApiService().getUserByID(1).then((value) => {
+    ApiService().getUserByID(userEmail).then((value) => {
           imageController.text = value.image,
           nameController.text = value.name,
           phoneController.text = value.phone,

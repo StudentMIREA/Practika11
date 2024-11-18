@@ -22,8 +22,11 @@ class _LoginPageState extends State<LoginPage> {
       await authService.signInWithEmailPassword(email, password);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: $e",
+              style: TextStyle(color: Colors.black, fontSize: 16.0)),
+          backgroundColor: Colors.amber[700],
+        ));
       }
     }
   }

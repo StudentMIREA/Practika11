@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pr11/Pages/EditPage.dart';
 import 'package:pr11/api_service.dart';
+import 'package:pr11/auth/auth_service.dart';
 import 'package:pr11/model/person.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -11,17 +12,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final authService = AuthService();
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<Person> person;
+  late Future<int> userId;
 
   @override
   void initState() {
     super.initState();
-    person = ApiService().getUserByID(1);
+
+    person = ApiService().getUserByID(userEmail);
   }
 
   void _refreshData() {
     setState(() {
-      person = ApiService().getUserByID(1);
+      person = ApiService().getUserByID(userEmail);
     });
   }
 
@@ -33,12 +38,19 @@ class _ProfilePageState extends State<ProfilePage> {
     _refreshData();
   }
 
+  void logout() async {
+    await authService.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.amber[200],
         appBar: AppBar(
           title: const Text('Профиль'),
+          actions: [
+            IconButton(onPressed: logout, icon: const Icon(Icons.logout))
+          ],
           backgroundColor: Colors.white70,
         ),
         body: FutureBuilder<Person>(
