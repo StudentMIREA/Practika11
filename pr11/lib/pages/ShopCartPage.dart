@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pr11/Pages/ItemPage.dart';
 import 'package:pr11/api_service.dart';
+import 'package:pr11/auth/auth_service.dart';
 import 'package:pr11/model/items.dart';
 
 class ShopCartPage extends StatefulWidget {
@@ -14,22 +15,23 @@ class ShopCartPage extends StatefulWidget {
 }
 
 class _ShopCartPageState extends State<ShopCartPage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<List<Items>> ItemsFromCart;
   late List<Items> UpdatedItemsFromCart;
 
   @override
   void initState() {
     super.initState();
-    ItemsFromCart = ApiService().getShopCartProducts(1);
-    ApiService().getShopCartProducts(1).then(
+    ItemsFromCart = ApiService().getShopCartProducts(userEmail!);
+    ApiService().getShopCartProducts(userEmail!).then(
           (value) => {UpdatedItemsFromCart = value},
         );
   }
 
   void _refreshData() {
     setState(() {
-      ItemsFromCart = ApiService().getShopCartProducts(1);
-      ApiService().getShopCartProducts(1).then(
+      ItemsFromCart = ApiService().getShopCartProducts(userEmail!);
+      ApiService().getShopCartProducts(userEmail!).then(
             (value) => {UpdatedItemsFromCart = value},
           );
     });
@@ -142,7 +144,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
         favorite: this_item.favorite,
         shopcart: this_item.shopcart,
         count: this_item.count + 1);
-    ApiService().updateProductShopCart(new_item, 1);
+    ApiService().updateProductShopCart(new_item, userEmail!);
     setState(() {
       UpdatedItemsFromCart.elementAt(
               UpdatedItemsFromCart.indexWhere((el) => el.id == this_item.id))
@@ -163,7 +165,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
           favorite: this_item.favorite,
           shopcart: this_item.shopcart,
           count: this_item.count - 1);
-      ApiService().updateProductShopCart(new_item, 1);
+      ApiService().updateProductShopCart(new_item, userEmail!);
     }
     setState(() {
       if (count > 1) {
@@ -259,7 +261,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                         ? 1
                                                         : 0);
                                             ApiService().deleteProductShopCart(
-                                                1, new_item.id);
+                                                userEmail!, new_item.id);
                                             setState(() {
                                               UpdatedItemsFromCart.removeAt(
                                                   UpdatedItemsFromCart

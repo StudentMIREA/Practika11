@@ -19,7 +19,8 @@ func GetCart(db *sqlx.DB) gin.HandlerFunc {
 									FROM products 
 									JOIN cart ON products.id = cart.product_id 
 									LEFT JOIN favorites ON products.id = favorites.product_id
-									WHERE cart.user_id = $1`, userId)
+									JOIN users ON cart.user_id = users.id
+									WHERE users.mail = $1`, userId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Ошибка получения списка продуктов",
@@ -39,7 +40,7 @@ func AddToCart(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
 			return
 		}
-		_, err := db.Exec("INSERT INTO cart (user_id, product_id, count) VALUES ($1, $2, $3)",
+		_, err := db.Exec("INSERT INTO cart (user_id, product_id, count) VALUES ((SELECT id FROM users WHERE mail = $1), $2, $3)",
 			userId, product.ID, product.Count)
 
 		if err != nil {
@@ -61,7 +62,7 @@ func UpdateShopCart(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
 			return
 		}
-		_, err := db.Exec("UPDATE cart SET count = $3 WHERE user_id = $1 AND product_id = $2",
+		_, err := db.Exec("UPDATE cart SET count = $3 WHERE user_id = (SELECT id FROM users WHERE mail = $1) AND product_id = $2",
 			userId, product.ID, product.Count)
 
 		if err != nil {
@@ -76,7 +77,7 @@ func RemoveFromCart(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("userId")
 		productId := c.Param("productId")
-		_, err := db.Exec("DELETE FROM cart WHERE user_id = $1 AND product_id = $2", userId, productId)
+		_, err := db.Exec("DELETE FROM cart WHERE user_id = (SELECT id FROM users WHERE mail = $1) AND product_id = $2", userId, productId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка удаления из корзины"})
 			return

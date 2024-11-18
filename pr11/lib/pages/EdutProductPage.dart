@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pr11/api_service.dart';
+import 'package:pr11/auth/auth_service.dart';
 import 'package:pr11/model/items.dart';
 
 class EditProductPage extends StatefulWidget {
@@ -11,6 +12,7 @@ class EditProductPage extends StatefulWidget {
 }
 
 class _EditProductPageState extends State<EditProductPage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   final TextEditingController _addController1 = TextEditingController();
   final TextEditingController _addController2 = TextEditingController();
   final TextEditingController _addController3 = TextEditingController();
@@ -23,7 +25,7 @@ class _EditProductPageState extends State<EditProductPage> {
   @override
   void initState() {
     super.initState();
-    ApiService().getProductsByID(widget.index).then((value) => {
+    ApiService().getProductsByID(widget.index, userEmail!).then((value) => {
           _addController1.text = value.name,
           _addController2.text = value.image,
           _addController3.text = value.cost.toString(),

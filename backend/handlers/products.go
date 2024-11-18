@@ -13,15 +13,16 @@ import (
 // Получение списка всех продуктов
 func GetProducts(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		userId := c.Param("userId")
 		var products []models.Product
 		err := db.Select(&products, `SELECT products.id, products.name, products.image, products.cost, products.description, 
-									(CASE WHEN (favorites.id IS NOT NULL) THEN true ELSE false END) as favorite,
-									(CASE WHEN (cart.id IS NOT NULL) THEN true ELSE false END) as shop_cart,
-									(CASE WHEN (cart.count IS NOT NULL) THEN cart.count ELSE 0 END) as count 
-									FROM products 
-									LEFT JOIN favorites ON products.id = favorites.product_id
-									LEFT JOIN cart ON products.id = cart.product_id 
-									ORDER BY products.id`)
+								(CASE WHEN (favorites.id IS NOT NULL) THEN true ELSE false END) as favorite,
+								(CASE WHEN (cart.id IS NOT NULL) THEN true ELSE false END) as shop_cart,
+								(CASE WHEN (cart.count IS NOT NULL) THEN cart.count ELSE 0 END) as count 
+								FROM products 
+								LEFT JOIN (SELECT favorites.id, favorites.product_id FROM favorites, users WHERE users.id = favorites.user_id AND users.mail = $1) as favorites ON products.id = favorites.product_id
+								LEFT JOIN (SELECT cart.id, cart.product_id, cart.count FROM cart, users WHERE users.id = cart.user_id AND users.mail = $1) as cart ON products.id = cart.product_id
+									ORDER BY products.id`, userId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Ошибка получения списка продуктов",
@@ -38,6 +39,7 @@ func GetProducts(db *sqlx.DB) gin.HandlerFunc {
 func GetProduct(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
+		userId := c.Param("userId")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID продукта"})
@@ -50,9 +52,9 @@ func GetProduct(db *sqlx.DB) gin.HandlerFunc {
 								(CASE WHEN (cart.id IS NOT NULL) THEN true ELSE false END) as shop_cart,
 								(CASE WHEN (cart.count IS NOT NULL) THEN cart.count ELSE 0 END) as count 
 								FROM products 
-								LEFT JOIN favorites ON products.id = favorites.product_id
-								LEFT JOIN cart ON products.id = cart.product_id
-								WHERE products.id = $1`, id)
+								LEFT JOIN (SELECT favorites.id, favorites.product_id FROM favorites, users WHERE users.id = favorites.user_id AND users.mail = $1) as favorites ON products.id = favorites.product_id
+								LEFT JOIN (SELECT cart.id, cart.product_id, cart.count FROM cart, users WHERE users.id = cart.user_id AND users.mail = $1) as cart ON products.id = cart.product_id
+								WHERE products.id = $2`, userId, id)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Продукт не найден"})
 			return

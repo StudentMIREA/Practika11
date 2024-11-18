@@ -19,7 +19,8 @@ func GetFavorites(db *sqlx.DB) gin.HandlerFunc {
 									FROM products 
 									LEFT JOIN cart ON products.id = cart.product_id 
 									JOIN favorites ON products.id = favorites.product_id
-									WHERE favorites.user_id = $1`, userId)
+									JOIN users ON favorites.user_id = users.id
+									WHERE users.mail = $1`, userId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Ошибка получения списка продуктов",
@@ -39,7 +40,7 @@ func AddToFavorites(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
 			return
 		}
-		_, err := db.Exec("INSERT INTO favorites (user_id, product_id) VALUES ($1, $2)",
+		_, err := db.Exec("INSERT INTO favorites (user_id, product_id) VALUES ((SELECT id FROM users WHERE mail = $1), $2)",
 			userId, product.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка добавления в избранное"})
@@ -53,7 +54,7 @@ func RemoveFromFavorites(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("userId")
 		productId := c.Param("productId")
-		_, err := db.Exec("DELETE FROM favorites WHERE user_id = $1 AND product_id = $2", userId, productId)
+		_, err := db.Exec("DELETE FROM favorites WHERE user_id = (SELECT id FROM users WHERE mail = $1) AND favorites.product_id = $2", userId, productId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка удаления из избранного"})
 			return

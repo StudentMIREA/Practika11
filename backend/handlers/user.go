@@ -25,6 +25,36 @@ func GetUser(db *sqlx.DB) gin.HandlerFunc {
 	}
 }
 
+// Создание нового продукта
+func CreateNewUser(db *sqlx.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		type NameMail struct {
+			Name string
+			Mail string
+		}
+		var product NameMail
+		if err := c.ShouldBindJSON(&product); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
+			fmt.Println(product)
+			return
+		}
+		query := `INSERT INTO users (name, mail) 
+                  VALUES (:Name, :Mail)`
+		_, err := db.NamedExec(query, map[string]interface{}{
+			"Name": product.Name,
+			"Mail": product.Mail,
+		})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка добавления продукта"})
+			fmt.Println("чет не то")
+			return
+		}
+
+		c.JSON(http.StatusOK, product)
+	}
+}
+
 // Обновление существующего продукта по его ID
 func UpdateUser(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {

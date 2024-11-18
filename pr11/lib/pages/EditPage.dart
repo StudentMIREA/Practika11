@@ -25,7 +25,9 @@ class _EditPageState extends State<EditPage> {
     ApiService().getUserByID(userEmail).then((value) => {
           imageController.text = value.image,
           nameController.text = value.name,
-          phoneController.text = value.phone,
+          value.phone != 'null'
+              ? phoneController.text = value.phone!
+              : phoneController.text = '',
           mailController.text = value.mail,
           img_link = value.image
         });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pr11/api_service.dart';
 import 'package:pr11/auth/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
       TextEditingController();
 
   void signUp() async {
+    final name = nameController.text;
     final email = mailController.text;
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
@@ -33,6 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     try {
       await authService.signUpWithEmailPassword(email, password);
+      await ApiService().addNewUser(name, email);
       Navigator.pop(context);
     } catch (e) {
       if (mounted) {

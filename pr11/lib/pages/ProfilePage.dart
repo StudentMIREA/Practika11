@@ -113,16 +113,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: const TextStyle(fontSize: 16.0),
                               ),
                             ),
-                            Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Expanded(
-                                    child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Телефон: ${person.phone}',
-                                    style: const TextStyle(fontSize: 14.0),
-                                  ),
-                                ))),
+                            person.phone != 'null'
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Expanded(
+                                        child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Телефон: ${person.phone}',
+                                        style: const TextStyle(fontSize: 14.0),
+                                      ),
+                                    )))
+                                : const SizedBox(),
                             Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Expanded(
